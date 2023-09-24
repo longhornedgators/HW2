@@ -32,55 +32,106 @@
 
 import SwiftUI
 
+enum Constants{
+  enum General {
+    public static let borderWidth = CGFloat(8)
+    public static let startSliderValue = Double(0)
+    public static let endSliderValue = Double(255)
+    public static let endPadding = Double(20)
+  }
+}
+
 struct ContentView: View {
   @State private var alertIsVisible: Bool = false
-  @State private var redColor: Double = 0.0
-  @State private var greenColor: Double = 0.0
-  @State private var blueColor: Double = 0.0
-  @State private var foregroundColor = Color(red: 0, green: 0, blue: 0)
+  @State private var sliderValue: Double = 0.0
+  @State private var sliderColor: Color = Color.white
+  @State private var redSliderValue: Double = 0.0
+  @State private var greenSliderValue: Double = 0.0
+  @State private var blueSliderValue: Double = 0.0
+  @State private var foregroundColor = Color(red: 255, green: 50, blue: 0)
 
   var body: some View {
-
+    ZStack {
+      Color("BackgroundColor")
+          .ignoresSafeArea()
     VStack {
-      Text("Color Picker")
-        .font(.largeTitle)
+      
+      FontText(text: "Color Picker")
 
       RoundedRectangle(cornerRadius: 0)
         .foregroundColor(foregroundColor)
-        .border(.black)
+        .border(Color.brown, width: Constants.General.borderWidth)
+       
+      
       VStack {
         Text("Red")
-        HStack {
-          Slider(value: $redColor, in: 0...255)
-          Text("\(Int(redColor.rounded()))")
-        }
+          .foregroundColor(Color("TextColor"))
+        SliderView(sliderValue: $redSliderValue, sliderColor: .constant(Color.red))
       }
       VStack {
         Text("Green")
-        HStack {
-          Slider(value: $greenColor, in: 0...255)
-          Text("\(Int(greenColor.rounded()))")
-        }
+          .foregroundColor(Color("TextColor"))
+        SliderView(sliderValue: $greenSliderValue, sliderColor: .constant(Color.green))
       }
       VStack {
         Text("Blue")
-        HStack {
-          Slider(value: $blueColor, in: 0...255)
-          Text("\(Int(blueColor.rounded()))")
-        }
+          .foregroundColor(Color("TextColor"))
+        SliderView(sliderValue: $blueSliderValue, sliderColor: .constant(Color.blue))
       }
-      Button("Set Color") {
-        foregroundColor = Color(red: redColor / 255, green: greenColor / 255, blue: blueColor / 255)
-      }
+      
+      ButtonView(redSliderValue: $redSliderValue, greenSliderValue: $greenSliderValue, blueSliderValue: $blueSliderValue, foregroundColor: $foregroundColor)
+   
     }
-    .background(Color.white)
-    .padding(20)
-
+    .padding(Constants.General.endPadding)
+    
+    }
   }
+}
+
+struct ButtonView: View {
+    @Binding var redSliderValue: Double
+    @Binding var greenSliderValue: Double
+    @Binding var blueSliderValue: Double
+    @Binding var foregroundColor: Color
+    
+    var body: some View{
+      Button("Set Color") {
+        foregroundColor = Color(red: redSliderValue / 255, green: greenSliderValue / 255, blue: blueSliderValue / 255)
+      }
+      .frame(width: 150.0, height: 50.0)
+      .background(
+          ZStack {
+              Color("ButtonColor")
+            LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.3), Color.clear]), startPoint: .top, endPoint: .bottom)
+              
+          }
+      )
+      .foregroundColor(.white)
+      .cornerRadius(21)
+      .bold()
+      .font(.title)
+    }
+   
+    }
+
+struct SliderView: View {
+    @Binding var sliderValue: Double
+    @Binding var sliderColor: Color
+    var body: some View{
+        HStack {
+          Slider(value: $sliderValue, in: Constants.General.startSliderValue...Constants.General.endSliderValue)
+            .accentColor(sliderColor)
+            Text("\(Int(sliderValue.rounded()))")
+        }
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
     ContentView()
+    ContentView()
+        .preferredColorScheme(.dark)
+        .previewDevice("iPhone 14 Pro Max")
   }
 }
+
